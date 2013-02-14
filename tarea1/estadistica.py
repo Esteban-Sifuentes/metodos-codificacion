@@ -31,9 +31,7 @@ def leerArchivo(nombreArchivo):
 
 	return contenido
 
-
 def transmisor(palabra, probaCeros, probaUnos):
-
 	palabraFinal = list()
 	for lista1 in palabra:
 		for elemento in lista1:
