@@ -54,44 +54,33 @@ def BoyerMoore_osvaldo(texto, llave):
 	intentos = 0
 	while caracter < len(texto):
 		intentos += 1
-		#print "caracter a probar", caracter
+		if debug:
+			print "caracter a probar", caracter
 		indicePalabras = caracter # para nunca perder en que posicion estamos
-		
 		try:
-			pedazoTexto = [texto[caracter+i] for i in xrange(len(llave))] # texto a comparar
+			# texto a comparar
+			pedazoTexto = [texto[caracter + i] for i in xrange(len(llave))] 
 		except:
-			break
+			break # no hay mas caracteres que comparar
 		anterior = len(llave) - 1 # el -1 para que no salga fuera del rango
-		acumulador = 0
-		ultimo = len(llave) - 1
-		#while anterior > 0:
+		acumulador = 0 # nos indicara cuantas pocisiones tenemos que brincar
+		ultimo = len(llave) - 1 # Para no bricar el indice[0]
 		if caracter == 0: # solo hacemos esto para el primer elemento porque tiene 
 						  # varias restricciones		
-			while anterior > 0:
+			while anterior > -1:
 				#print "anterior: ", anterior
 				# comparamos el pedazo de texto contra la llave de der-izq
 				pedazoTexto = "".join(pedazoTexto)
 				iguales = False
-				#if(pedazoTexto[ultimo] != llave[ultimo]) and \
-				#										(pedazoTexto[0] != llave[0] ) and \
-				#										(pedazoTexto[ultimo] != llave[0]):
-				#	print "1"
-				#	# significa que no son iguales y 
-				#	# el primer elemente del pedazo de texto es diferente al primer 
-				#	# elemento de la llave
-				#	caracter += len(llave)  # sumamos la longitud de la llave al caracter actual
-				#							# esto quiere decir que la llave no esta en la primera
-				#							# comparacion
-				#	break # pasemos al sig. caracter
 				if(pedazoTexto[ultimo] != llave[ultimo]) and \
 														(pedazoTexto[ultimo] == llave[0]):
 					# significa que el ultimo elemento del pedazo de texto y el ultimo elemento
 					# de la llave son distintos pero(and) el ultimo elemento del pedazo de texto
 					# es igual al primer elemento de la llave
-					print "2"
-					caracter += (len(llave) - 1) # restamos 1 a longitud porque cabe la 
-												 # posibilidad que el ultimo elemento sea el 
-												 # inicio de la llave
+					#print "2"
+					caracter += ultimo # restamos 1 a longitud porque cabe la 
+									   # posibilidad que el ultimo elemento sea el 
+									   # inicio de la llave
 					break # pasemos al sig. caracter				
 				elif(pedazoTexto[anterior] == llave[anterior]):
 					# "igual"
@@ -110,17 +99,22 @@ def BoyerMoore_osvaldo(texto, llave):
 				#print "PRIMER ELEMENTO - IGUALES"
 				indiceInicalPalabraEncontrada.append(indicePalabras)
 				caracter += acumulador
-
 		else:
-			while anterior > -1:
-				#ya estamos en el algoritmo de comparacion
+			# ya estamos en el algoritmo de comparacion
+			while anterior > -1: # Para no bricar el indice[0]
 				if pedazoTexto[anterior] == llave[anterior]:
 					acumulador += 1
 					anterior -= 1
 					iguales = True
+				elif(pedazoTexto[0]) == llave[0]:
+					# significa los primeros elementos de cada lista es igual pero el
+					#ultimo es diferente, es este caso hacer un brinco del tamano de la letra
+					caracter += len(llave) 
+					iguales = False
+					break # pasemos al sig. caracter
 				else:
 					# "se equivoco en la busqueda"
-					acumulador += 1
+					acumulador += 1 
 					caracter += acumulador
 					iguales = False
 					break # pasemos al sig. caracter
@@ -131,8 +125,7 @@ def BoyerMoore_osvaldo(texto, llave):
 	
 	return(indiceInicalPalabraEncontrada, intentos)
 
-
-
+debug = False
 
 TEXTO = "gatoratongataratongato"
 LLAVE = "gato"
@@ -141,12 +134,8 @@ print "texto: ", TEXTO
 print "llave: ", LLAVE
 
 indicePalabras, intentos = MorrisPratt_pagina(TEXTO, LLAVE)
-indicePalabras2, intentos2 = MorrisPratt_osvaldo(TEXTO, LLAVE)
-#print "MorrisPratt_pagina =>  ", indicePalabras, "intentos", intentos
-print "MorrisPratt =>  ", indicePalabras#, "intentos", intentos
-#print "MorrisPratt_osvaldo => ", indicePalabras2, "intentos", intentos2
+indicePalabras2, intentos2 = MorrisPratt_osvaldo(TEXTO, LLAVE) 
 indicePalabras3, intentos3 = BoyerMoore_osvaldo(TEXTO, LLAVE)
-#print "BoyerMoore_osvaldo =>  ", indicePalabras3, "intentos", intentos3
-print "BoyerMoore =>  ", indicePalabras#, "intentos", intentos
 
-
+print "MorrisPratt =>  ", indicePalabras, "intentos", intentos
+print "BoyerMoore =>  ", indicePalabras3, "intentos", intentos3
