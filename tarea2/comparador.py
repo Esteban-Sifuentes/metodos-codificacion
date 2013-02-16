@@ -1,141 +1,131 @@
-def MorrisPratt_osvaldo(texto, llave):
-	longitud = len(llave)
-	indiceInicalPalabraEncontrada = list()
-	intentos  = 0
+import random
 
-	for indice, caracter in enumerate(texto):
-		intentos += 1
-		letraFormada = list()
-		cont = 0
-		if caracter == llave[cont]:
-			sigIndice = indice
-			while cont < longitud:
-				letraFormada.append(texto[sigIndice])
-				sigIndice += 1
-				cont += 1
-			letraFormada = "".join(letraFormada)
-			if llave == letraFormada:
-				indiceInicalPalabraEncontrada.append(indice)
-				
-	return(indiceInicalPalabraEncontrada ,intentos)
+# clase que genera texto y patrones
+class Generador:
+	def __init__(self, *longitud):
+		self.texto = longitud[0]
+		self.patron = longitud[1]
 
-def MorrisPratt_pagina(texto, llave):
-	longitud = len(llave)
-	indiceInicalPalabraEncontrada= list()
-	
-	caracter = 0 # para recorrer el largo del texto
-	intentos = 0 # intentos para encontrar la llave en el texto
+	def generarTexto(self):
+		textoFormado = [chr(random.randrange(97, 105)) for i in xrange(self.texto)]
+		textoFormado = "".join(textoFormado)
+		return textoFormado
 
-	while caracter < len(texto):
-		indicePalabra = caracter
-		sig = 0 # para recorrer la llave
-		intentos += 1
-		while sig < len(llave): # recorremos la llave
-			if texto[caracter] == llave[sig]:
-				sig += 1 # incrementamos caracter de la llave
-				caracter += 1 # incrementamos caracter del texto
-				iguales = True
-			else: # no son iguales
-				caracter += 1 # incrementamos caracter del texto
-				iguales = False
-				break
-
-		if iguales:
-			indiceInicalPalabraEncontrada.append(indicePalabra) 
-
-	return(indiceInicalPalabraEncontrada, intentos)
+	def genererPatron(self):
+		patronFormado = [chr(random.randrange(97, 105)) for i in xrange(self.patron)]
+		patron = "".join(patronFormado)
+		return patron
 
 
-def BoyerMoore_osvaldo(texto, llave):
-	#print "largo", len(texto)
-	#print "largo LLAVE", len(llave)
-	indiceInicalPalabraEncontrada = list()
-	caracter = 0
-	intentos = 0
-	while caracter < len(texto):
-		intentos += 1
-		if debug:
-			print "caracter a probar", caracter
-		indicePalabras = caracter # para nunca perder en que posicion estamos
-		try:
-			# texto a comparar
-			pedazoTexto = [texto[caracter + i] for i in xrange(len(llave))] 
-		except:
-			break # no hay mas caracteres que comparar
-		anterior = len(llave) - 1 # el -1 para que no salga fuera del rango
-		acumulador = 0 # nos indicara cuantas pocisiones tenemos que brincar
-		ultimo = len(llave) - 1 # Para no bricar el indice[0]
-		if caracter == 0: # solo hacemos esto para el primer elemento porque tiene 
-						  # varias restricciones		
-			while anterior > -1:
-				#print "anterior: ", anterior
-				# comparamos el pedazo de texto contra la llave de der-izq
-				pedazoTexto = "".join(pedazoTexto)
-				iguales = False
-				if(pedazoTexto[ultimo] != llave[ultimo]) and \
-														(pedazoTexto[ultimo] == llave[0]):
-					# significa que el ultimo elemento del pedazo de texto y el ultimo elemento
-					# de la llave son distintos pero(and) el ultimo elemento del pedazo de texto
-					# es igual al primer elemento de la llave
-					#print "2"
-					caracter += ultimo # restamos 1 a longitud porque cabe la 
-									   # posibilidad que el ultimo elemento sea el 
-									   # inicio de la llave
-					break # pasemos al sig. caracter				
-				elif(pedazoTexto[anterior] == llave[anterior]):
-					# "igual"
-					#print "3"
-					acumulador += 1
-					anterior -= 1
-					iguales = True
-				else:
-					#print "4"
-					# "se equivoco en la busqueda"
-					acumulador += 1
-					caracter += acumulador
+# Clase que se encarga de comparar un patron si esta dentro de un texto(strings)
+class Comparador:
+	def __init__(self, *parametro):
+		self.texto = parametro[0]
+		self.patron = parametro[1]
+		self.lenTexto = len(parametro[0]) 
+		self.lenPatron = len(parametro[1])
+		self.tablaSaltos = parametro[2]
+
+	def comparadorBasico(self):
+		indiceInicalPalabraEncontrada = list()
+		intentos  = 0
+
+		for indice, caracter in enumerate(self.texto):
+			intentos += 1
+			letraFormada = list()
+			cont = 0
+			if caracter == self.patron[cont]:
+				sigIndice = indice
+				while cont < self.lenPatron:
+					letraFormada.append(self.texto[sigIndice])
+					sigIndice += 1
+					cont += 1
+				letraFormada = "".join(letraFormada)
+				if self.patron == letraFormada:
+					indiceInicalPalabraEncontrada.append(indice)
+
+		return(indiceInicalPalabraEncontrada ,intentos)
+
+	def morrisPratt(self):
+		indiceInicalPalabraEncontrada= list()
+		
+		caracter = 0 # para recorrer el largo del texto
+		intentos = 0 # intentos para encontrar el patron en el texto
+
+		while caracter < self.lenTexto:
+			indicePalabra = caracter
+			sig = 0 # para recorrer el patron
+			intentos += 1
+			while sig < self.lenPatron: # recorremos el patron
+				try:
+					if self.texto[caracter] == self.patron[sig]:
+						sig += 1 # incrementamos caracter del patron
+						caracter += 1 # incrementamos caracter del texto
+						iguales = True
+					else: # no son iguales
+						caracter += 1 # incrementamos caracter del texto
+						iguales = False
+						break # saltamos al sig. caracter
+				except:
 					iguales = False
-					break # pasemos al sig. caracter
+					break # no hay mas caracteres que comparar
 			if iguales:
-				#print "PRIMER ELEMENTO - IGUALES"
-				indiceInicalPalabraEncontrada.append(indicePalabras)
-				caracter += acumulador
-		else:
-			# ya estamos en el algoritmo de comparacion
-			while anterior > -1: # Para no bricar el indice[0]
-				if pedazoTexto[anterior] == llave[anterior]:
-					acumulador += 1
-					anterior -= 1
-					iguales = True
-				elif(pedazoTexto[0]) == llave[0]:
-					# significa los primeros elementos de cada lista es igual pero el
-					#ultimo es diferente, es este caso hacer un brinco del tamano de la letra
-					caracter += len(llave) 
-					iguales = False
-					break # pasemos al sig. caracter
-				else:
-					# "se equivoco en la busqueda"
-					acumulador += 1 
-					caracter += acumulador
-					iguales = False
-					break # pasemos al sig. caracter
-			if iguales:
-				#print "IGUALES"
-				indiceInicalPalabraEncontrada.append(indicePalabras)
-				caracter += acumulador
-	
-	return(indiceInicalPalabraEncontrada, intentos)
+				indiceInicalPalabraEncontrada.append(indicePalabra) 
 
-debug = False
+		return(indiceInicalPalabraEncontrada, intentos)
 
-TEXTO = "gatoratongataratongato"
-LLAVE = "gato"
+	def boyerMoore(self):
+		indiceInicalPalabraEncontrada = list()
+		print "En proceso..."
+		intentos = 0
+		return(indiceInicalPalabraEncontrada, intentos)
 
-print "texto: ", TEXTO
-print "llave: ", LLAVE
+def tabla(patron):
+	# buscamos todas la distintas palabras en el patron y agregamos su indice
+	tablaSaltos = {}
+	for i in patron: 
+		if not tablaSaltos.has_key(i):
+			# agregamos la letra con su indice en la tabla
+			tablaSaltos[i] = patron.index(i) + 1
+	return tablaSaltos
 
-indicePalabras, intentos = MorrisPratt_pagina(TEXTO, LLAVE)
-indicePalabras2, intentos2 = MorrisPratt_osvaldo(TEXTO, LLAVE) 
-indicePalabras3, intentos3 = BoyerMoore_osvaldo(TEXTO, LLAVE)
 
-print "MorrisPratt =>  ", indicePalabras, "intentos", intentos
-print "BoyerMoore =>  ", indicePalabras3, "intentos", intentos3
+def reversa(cadena):
+	# este for esta para poner los datos de "reversa"
+	for indice in range(len(cadena) - 2, -1, -1):
+		yield cadena[indice]
+
+def diferencias(texto, patron):
+	patron = list(patron)
+	for i in texto:
+		if i not in patron:
+			patron.insert(0, i)
+	patron = "".join(patron)
+	return patron
+
+def main():
+	#gene = Generador(4, 3)
+	#texto = gene.generarTexto()
+	#patron = gene.genererPatron()
+
+	texto = "gatoratongataratongato"
+	patron = copyPatron = "gato"
+
+	#texto = "GCATCGCAGAGAGTATACAGTACG"
+	#patron = copyPatron = "GCAGAGAG"
+
+	copyPatron = diferencias(texto, copyPatron)
+	# lista temporal para guardar las letra en reversa
+	copyPatron = [letra for letra in reversa(copyPatron)]
+	copyPatron = "".join(copyPatron) #convertimos la lista en 
+	tablaSaltos = tabla(copyPatron)
+
+	comp = Comparador(texto, patron, tablaSaltos)
+	(basico, intentosBasico) = comp.comparadorBasico()
+	(morris, intentosMorris) = comp.morrisPratt()
+
+	print "indice para basico => ", basico
+	print "indice para morris => ", morris 
+
+
+main()
