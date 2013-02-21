@@ -60,7 +60,7 @@ def main(lenTexto, lenPatron):
 	#patron = copyPatron = "GCAGAGAG"
 
 	gene = Generador(lenTexto, lenPatron)
-	texto = gene.generarPatron()
+	texto = gene.generarTexto()
 	patron = gene.generarPatron()
 
 	# creamos el objeto
