@@ -27,10 +27,10 @@ def crearEnlaces(listaLetras): # recibe una lista de tuplas
 		der = listaLetras[1]
 		# los unimos...
 		valorNodo = izq[1] + der[1]
-		nodos[(izq[0], valorNodo)] = 0
-		nodos[(der[0], valorNodo)] = 1
+		nodos[izq[0], valorNodo] = 0
+		nodos[der[0], valorNodo] = 1
 		# creeamos el nuevo nodo...
-		listaLetras.append((valorNodo, valorNodo))
+		listaLetras.append([valorNodo, valorNodo])
 		# eliminamos los nodos procesados...
 		listaLetras.pop(0)
 		listaLetras.pop(0)
@@ -41,9 +41,8 @@ def crearEnlaces(listaLetras): # recibe una lista de tuplas
 	return(nodos, listaLetras[0])
 
 
-def buscarRaiz(nodoActual, nodos, nodoFinal):
+def buscarCodigoLetra(nodoActual, nodos, nodoFinal):
 	raiz = list()
-	
 	while nodoActual != nodoFinal[0]:
 		raiz.append(nodoActual[1]) # agregamos el valor de la arista
 		nodoActual = nodoActual[0][1] # asignamos el nuevo nodo actual
@@ -52,11 +51,43 @@ def buscarRaiz(nodoActual, nodos, nodoFinal):
 			if items[0][0] == nodoActual:
 				nodoActual = items
 				break
+	raiz.reverse()
 	return raiz
+
+
+def dibujarGrafo(nodos):
+	import networkx as nx
+	import matplotlib.pyplot as plt
+
+	print "---- DIBUJANDO GRAFO ----"
+	print "Si el grafo sale muy amontonado, volver a ejecutar el python"
+	print "NOTA: El nodo mayor es la raiz"
+	#print "Nodos:\n", nodos
+
+	G = nx.DiGraph() # Se crea un grafo vacio
+	R = [tupla[0] for tupla in nodos] # Se crean los nodos
+	G.add_edges_from(R) # Se agregan los nodos al grafo vacio
+	pos = nx.spring_layout(G) # diseno y posiciones
+	# dibujamos todo
+	nx.draw_networkx_nodes(G, pos) 
+	nx.draw_networkx_edges(G, pos)
+	nx.draw_networkx_labels(G, pos)
+
+	for nodosUnion, valorArista in nodos:
+		nx.draw_networkx_edge_labels(G, pos, 
+			{
+				nodosUnion : valorArista
+			}
+		)
+
+	plt.savefig("Huffman.png"); # guardamos en archivo
+	plt.show() # abrimos la ventana
+	return	
+
 
 def main():
 
-	debug = True
+	debug = False
 
 	if debug:
 		cadena = "aaabbcccccddeeeefhhhhxxh"
@@ -67,6 +98,8 @@ def main():
 		The more frequent the value, the closer to the root it is located and the smaller its binary representation. 
 		Once the lookup table is created, it is used to compress the data, and subsequently to decompress it.'''
 	
+	print "cadena:", cadena
+
 	# filtro para quitar tabulaciones y saltos de linea
 	cadena = cadena.replace("\t", "").replace("\n", " ") 
 
@@ -78,30 +111,22 @@ def main():
 	# ordenar los nodos de menor a mayor
 	nodos = ordenarMenorMayor(nodos, "nodos")
 
-	# buscamos las raices(el valor de la arista) de cada nodo
-	raices = list()
-	while len(nodos) > 0:
-		nodoActual = nodos[0] # tomamos el primer elemento de los nodos
-		raices.append((nodoActual[0][0], buscarRaiz(nodoActual, nodos, nodoFinal))) # buscamos su raiz
-		nodos.pop(0) # eliminamos el nodo procesado
+	copyNodos = list(nodos) 
 
-	print raices
-	print raices[0][1]
-
-
-	for indice, tupla in enumerate(raices):
-		reversa = tupla[1].reverse()
-		print reversa
-		raices[indice][1] = reversa 
-
-
+	# buscamos las codigos(el valor de la aristas) de cada nodo
+	codigos = list()
+	while len(copyNodos) > 0:
+		nodoActual = copyNodos[0] # tomamos el primer elemento de los copyNodos
+		codigos.append([nodoActual[0][0], buscarCodigoLetra(nodoActual, copyNodos, nodoFinal)]) # buscamos su raiz
+		copyNodos.pop(0) # eliminamos el nodo procesado	
 
 	print "-----"
-	
 	print "Total de caracteres en la cadena:", len(cadena)
 	print "Total de caracteres unicos:", len(letras)
-	print "Raices:", raices
+	print "Codigos:\n", codigos
 
+	# dibujamos el grafo
+	dibujarGrafo(nodos)
 
 
 main()
