@@ -1,4 +1,4 @@
-
+# buscamos las letras diferentes en la cadena
 def obtenerLetras(cadena):
 	letras = dict()
 	for caracter in cadena:
@@ -10,7 +10,7 @@ def obtenerLetras(cadena):
 	return letras
 
 
-# ordena de mayor a menor por el elemento[1] de la tupla
+# ordena de mayor a menor por el elemento[x] de la tupla
 def ordenarMenorMayor(lista, metodo="listaTuplas"): # lista de tuplas
 	if metodo == "listaTuplas":
 		return sorted(lista, key=lambda o: o[1])
@@ -54,6 +54,30 @@ def buscarCodigoLetra(nodoActual, nodos, nodoFinal):
 	raiz.reverse()
 	return raiz
 
+def comprimir(cadena, codigos):
+	msnComprimido = ""
+	for caracter in cadena:
+		for nodo, codigo in codigos:
+			if nodo == caracter:
+				# convertir una cadena de INT en STR
+				msnComprimido += "".join(map(str, codigo))
+				break
+	return msnComprimido
+
+def descomprimir(cadenaBinaria, codigos):
+	msnDescomprimido = ""
+	posibleLetra = ""
+	
+
+
+
+	# pendiente
+
+
+
+
+	return msnDescomprimido
+
 
 def dibujarGrafo(nodos):
 	import networkx as nx
@@ -87,7 +111,9 @@ def dibujarGrafo(nodos):
 
 def main():
 
-	debug = False
+	debug = True
+	dibujar = False # mostrar el grafo con(networkx) dibujos
+
 
 	if debug:
 		cadena = "aaabbcccccddeeeefhhhhxxh"
@@ -112,21 +138,30 @@ def main():
 	nodos = ordenarMenorMayor(nodos, "nodos")
 
 	copyNodos = list(nodos) 
-
-	# buscamos las codigos(el valor de la aristas) de cada nodo
+	# buscamos los codigos(el valor de la aristas) de cada nodo
 	codigos = list()
 	while len(copyNodos) > 0:
 		nodoActual = copyNodos[0] # tomamos el primer elemento de los copyNodos
 		codigos.append([nodoActual[0][0], buscarCodigoLetra(nodoActual, copyNodos, nodoFinal)]) # buscamos su raiz
 		copyNodos.pop(0) # eliminamos el nodo procesado	
 
+
+	# pasar la cadena original en binaria(comprimir)
+	msnComprimido = comprimir(cadena, codigos)
+	# rescatar la cadena original a partir de la binaria(descomprimir)
+	msnDescomprimido = descomprimir(msnComprimido, cadena)
+
 	print "-----"
 	print "Total de caracteres en la cadena:", len(cadena)
 	print "Total de caracteres unicos:", len(letras)
 	print "Codigos:\n", codigos
+	print "-----"
+	print "Mensaje comprimido:\n", msnComprimido
+	print "Mensaje descomprimido:\n", msnDescomprimido
 
-	# dibujamos el grafo
-	dibujarGrafo(nodos)
+	if dibujar:
+		# dibujamos el grafo
+		dibujarGrafo(nodos)
 
 
 main()
